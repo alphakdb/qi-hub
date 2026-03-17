@@ -32,7 +32,7 @@ writestack:{[st;x]
 
 readstack:{[st] 
   .qi.info(`readstack;st);
-  read0 findstack st
+  $[.qi.exists p:.qi.path(.conf.STACKS;st;`stack.json);read0 p;'.qi.spath[p]," not found"]
   }
 
 deletestack:{[st]
