@@ -74,6 +74,7 @@ refresh:{
   .qi.info"refresh[]";
   .proc.loadstacks[];
   updprocs[];
+  monprocs[];
   }
 
 updprocs:{
