@@ -66,7 +66,8 @@ renamestack:{[st;nst]
   .proc.reporthealth[];
   monprocs[];
   .cron.start[];
-  .ipc.ping[exec name from procs where name<>`hub,.proc.isup'[name;stackname];".proc.reporthealth[]"] ;
+  /dbg;
+  /.ipc.ping[exec name from procs where name<>`hub,.proc.isup'[name;stackname];".proc.reporthealth[]"] ;
   }
 
 refresh:{
@@ -124,8 +125,9 @@ updAPI:{
   }
 
 check:{
-  update status:`down`up isup each name from`procs;
-  update pid:0Ni,heap:0N,used:0N from `procs where status=`down;
+  a:update health:{.proc.checkhealth .` vs x}each name from procs;
+  a:update status:`down`up health[;0]from a;
+  `procs set delete health from a,'exec health[;1]from a;
   update status:`busy from`procs where status=`up,not null lastheartbeat,lastheartbeat<.z.p-.conf.HUB_BUSY_PERIOD;
   if[count tostart:select from procs where goal=`up,status=`down,attempts<.conf.MAX_START_ATTEMPTS;
     if[count tostart:delete from tostart where not null lastattempt,.conf.HUB_ATTEMPT_PERIOD>.z.p-lastattempt;
