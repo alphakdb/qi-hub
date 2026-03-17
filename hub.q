@@ -58,16 +58,13 @@ renamestack:{[st;nst]
 / ------ End Public API functions
 
 .hub.init:{
-  .proc.self,:`name`stackname`fullname!3#`hub;
+  .proc.self,:`name`stackname`fullname`subscribe_to!(`hub;`hub;`hub;());
   updprocs[];
   .cron.add[`check;0Np;.conf.HUB_CHECK_PERIOD];
-  .event.delhandler[`.z.pc;`.ipc.pc];
   system"p ",.qi.tostr .conf.HUB_PORT;
   .proc.reporthealth[];
   monprocs[];
   .cron.start[];
-  /dbg;
-  /.ipc.ping[exec name from procs where name<>`hub,.proc.isup'[name;stackname];".proc.reporthealth[]"] ;
   }
 
 refresh:{
@@ -106,6 +103,7 @@ updown:{[cmd;x]
 
 up:updown`up
 down:updown`down
+kill:.proc.kill
 
 heartbeat:{[pname;info]
   /.qi.info(`heartbeat;pname;info);
