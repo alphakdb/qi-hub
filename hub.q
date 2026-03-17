@@ -109,12 +109,6 @@ up:updown`up
 down:updown`down
 kill:.proc.kill
 
-heartbeat:{[pname;info]
-  /.qi.info(`heartbeat;pname;info);
-  if[null st:(e:procs pname)`status;:.qi.error"invalid process name ",string[pname]," ",.Q.s1 info];
-  procs[pname],:select used,heap,status:`up,pid,lastheartbeat:time,attempts:0N from info;
-  }
-
 upall:{up each exec name from procs;}
 downall:{down each exec name from procs;}
 isup:{[fullname] .proc.isup . ` vs fullname}
