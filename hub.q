@@ -118,7 +118,7 @@ isup:{[fullname] .proc.isup . ` vs fullname}
 updAPI:{
   if[sub:count .z.W;pub[`processes;0!procs]];
   if[not count MonText;:()];
-  if[sub;pub[`Logs;MonText lj .hub.logmap]];
+  if[sub;pub[`Logs;MonText lj `sym xkey select sym:logfile,name from .hub.procinfo]];
   delete from`MonText;
   }
 
