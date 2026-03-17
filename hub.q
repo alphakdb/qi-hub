@@ -8,11 +8,14 @@ ws.pushall:{if[count h:where"w"=k!exec p from -38!k:key .z.W;ws.push[h;x]]}
 .z.ws:{a:.j.k x;r:@[get;a`cmd;{"kdb error: ",x}];if[not"none"~cb:a`callback;ws.push[.z.w;(cb;r)]]}    / cb=callback
 pub:{[t;x] ws.pushall("upd";(t;x))}
 
-findstack:{[st] $[not null p:.proc.stackpaths st;p;null p:first .qi.paths[.conf.STACKS;.qi.ext[st;".json"]]; '"Could not find a ",.qi.tostr[st],".json in ",.qi.spath .conf.STACKS;p]}
+/findstack:{[st] $[not null p:.proc.stackpaths st;p;null p:first .qi.paths[.conf.STACKS;.qi.ext[st;".json"]]; '"Could not find a ",.qi.tostr[st],".json in ",.qi.spath .conf.STACKS;p]}
 cpmvstack:{[copy;st;nst]
-  $[.qi.exists dest:.qi.path(first` vs a:findstack st;` sv nst,`json);
-    '.qi.spath[dest]," already exists";
-  $[copy;.qi.cp;.qi.os.mv][a;dest]]
+  if[not .qi.exists frm:.qi.path(.conf.STACKS;st);
+    '.qi.spath[frm]," not found"];
+  if[.qi.exists to:.qi.path(.conf.STACKS;nst);
+    '.qi.spath[tp]," already exists"];
+  $[copy;.qi.os.cp;.qi.os.mv][frm;to];
+  refresh[];
   }
 
 / ---- Start Public API Functions ----
@@ -37,13 +40,15 @@ deletestack:{[st]
   if[count a:select from procs where stackname=st,status<>`down;
     show a;
     '"Cannot delete a stack with running processes"];
-  hdel findstack st;
+  if[not .qi.exists p:.qi.path(.conf.STACKS;st);
+    '.qi.spath[p]," not found"];
+  .qi.deldir p;
   refresh[]
   }
 
 clonestack:{[st;nst] 
  .qi.info(`clonestack;st;nst);
-  cpmvstack[1;st;nst];refresh[];
+  cpmvstack[1;st;nst];
   }
 
 renamestack:{[st;nst]
@@ -51,9 +56,7 @@ renamestack:{[st;nst]
   if[count a:select from procs where stackname=st,status=`up;
     show a;
     '"Cannot rename a stack with running processes"];
-  r:cpmvstack[0;st;nst];
-  refresh[];
-  r
+  cpmvstack[0;st;nst];
   }
 / ------ End Public API functions
 
