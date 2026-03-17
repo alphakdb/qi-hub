@@ -22,9 +22,7 @@ writestack:{[st;x]
   .qi.info(`writestack;st);
   if[not first r:.qi.try[.j.k;raze x;0];
     '"stack json is badly formed: ",r 2];
-  if[null p:.proc.stackpaths st;
-    p:.qi.path(.conf.STACKS;`ui;.qi.ext[st;".json"])];
-  p 0:x;
+  (p:.qi.path(.conf.STACKS;st;`stack.json))0:x;
   refresh[];
   p
   }
