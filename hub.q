@@ -8,7 +8,6 @@ ws.pushall:{if[count h:where"w"=k!exec p from -38!k:key .z.W;ws.push[h;x]]}
 .z.ws:{a:.j.k x;r:@[get;a`cmd;{"kdb error: ",x}];if[not"none"~cb:a`callback;ws.push[.z.w;(cb;r)]]}    / cb=callback
 pub:{[t;x] ws.pushall("upd";(t;x))}
 
-/findstack:{[st] $[not null p:.proc.stackpaths st;p;null p:first .qi.paths[.conf.STACKS;.qi.ext[st;".json"]]; '"Could not find a ",.qi.tostr[st],".json in ",.qi.spath .conf.STACKS;p]}
 cpmvstack:{[copy;st;nst]
   if[not .qi.exists frm:.qi.path(.conf.STACKS;st);
     '.qi.spath[frm]," not found"];
