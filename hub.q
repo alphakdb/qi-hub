@@ -8,15 +8,6 @@ ws.pushall:{if[count h:where"w"=k!exec p from -38!k:key .z.W;ws.push[h;x]]}
 .z.ws:{a:.j.k x;r:@[get;a`cmd;{"kdb error: ",x}];if[not"none"~cb:a`callback;ws.push[.z.w;(cb;r)]]}    / cb=callback
 pub:{[t;x] ws.pushall("upd";(t;x))}
 
-cpmvstack:{[copy;st;nst]
-  if[not .qi.exists frm:.qi.path(.conf.STACKS;st);
-    '.qi.spath[frm]," not found"];
-  if[.qi.exists to:.qi.path(.conf.STACKS;nst);
-    '.qi.spath[tp]," already exists"];
-  $[copy;.qi.os.cp;.qi.os.mv][frm;to];
-  refresh[];
-  }
-
 / ---- Start Public API Functions ----
 writestack:{[st;x]
   .qi.info(`writestack;st);
@@ -43,9 +34,14 @@ deletestack:{[st]
   refresh[]
   }
 
-clonestack:{[st;nst] 
- .qi.info(`clonestack;st;nst);
-  cpmvstack[1;st;nst];
+clonestack:{[st;nst;port2]
+  .qi.info(`clonestack;st;nst);
+  if[.qi.exists targ:(.conf.STACKS;nst;`stack.json);
+    '.qi.spath[targ]," already exists"];
+  a:.qi.readj (.conf.STACKS;st;`stack.json);
+  port:$[0^port2;port2;count s:1_.proc.stacks;1000+max get s[;`base_port];.conf.HUB_PORT];
+  a:@[a;`base_port;:;port];
+  writestack[nst;.qi.formatj .j.j a];
   }
 
 renamestack:{[st;nst]
@@ -53,7 +49,10 @@ renamestack:{[st;nst]
   if[count a:select from procs where stackname=st,status=`up;
     show a;
     '"Cannot rename a stack with running processes"];
-  cpmvstack[0;st;nst];
+  frm:.qi.path(.conf.STACKS;st);
+  if[.qi.exists to:.qi.path(.conf.STACKS;nst);'.qi.spath[tp]," already exists"];
+  .qi.os.mv[frm;to];
+  refresh[];
   }
 / ------ End Public API functions
 
@@ -97,8 +96,9 @@ updown:{[cmd;x]
   if[11=t;.z.s each x;:(::)];
   if[x in`all,as:1_key .proc.stacks;.z.s[cmd]each $[x=`all;as;.proc.stackprocs x];:(::)];
   if[null status:(e:procs nm:.proc.tofullname x)`status;'"invalid process name ",string nm];
+  procs[nm;`goal]:cmd;
   if[status=cmd;:(::)];
-  procs[nm],:select attempts:1+0^attempts,lastattempt:.z.p,goal:cmd from e;
+  procs[nm],:select attempts:1+0^attempts,lastattempt:.z.p from e;
   .proc[cmd]nm;
   }
 
