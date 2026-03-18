@@ -108,7 +108,6 @@ kill:.proc.kill
 
 upall:{up each exec name from procs;}
 downall:{down each exec name from procs;}
-isup:{[fullname] .proc.isup . ` vs fullname}
 
 updAPI:{
   if[sub:count .z.W;pub[`processes;0!procs]];
