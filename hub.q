@@ -34,13 +34,15 @@ deletestack:{[st]
   refresh[]
   }
 
+refreshlogs:{{if[.qi.exists p:x`logfile;`MonText insert(.z.p;p;x`stackname;.proc.tail x`name)]}each 0!.hub.procinfo}
+
 clonestack:{[st;nst;port2]
   .qi.info(`clonestack;st;nst);
   if[.qi.exists targ:(.conf.STACKS;nst;`stack.json);
     '.qi.spath[targ]," already exists"];
   a:.qi.readj (.conf.STACKS;st;`stack.json);
   port:$[0^port2;port2;count s:1_.proc.stacks;1000+max get s[;`base_port];.conf.HUB_PORT];
-  a:@[a;`base_port;:;port];
+  a[`base_port]:port;
   writestack[nst;.qi.formatj .j.j a];
   }
 
