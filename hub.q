@@ -34,7 +34,12 @@ deletestack:{[st]
   refresh[]
   }
 
-refreshlogs:{{if[.qi.exists p:x`logfile;`MonText insert(.z.p;p;x`stackname;.proc.tail x`name)]}each 0!.hub.procinfo}
+refreshlogs:{[st;nm]
+  a:0!.hub.procinfo;
+  if[not null st;a:select from a where stackname=st];
+  if[count nm;a:select from a where name in nm];
+  {$[.qi.exists p:x`logfile;`time`sym`stackname`lines!(.z.p;p;x`stackname;.proc.tail x`name);()]}each a
+  }
 
 clonestack:{[st;nst;port2]
   .qi.info(`clonestack;st;nst);
