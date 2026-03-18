@@ -78,13 +78,13 @@ updprocs:{
    pr:1!select name,proc,stackname,port,status:`down,pid:0Ni,lastheartbeat:0Np,attempts:0N,lastattempt:0Np,lastattempt:0Np,used:0N,heap:0N,goal:` from .ipc.conns where proc<>`hub;
   `procs set $[`procs in tables`.;pr upsert select from procs where status<>`down;pr];
   a:select from .proc.getstacks[] where fullname in exec name from procs;
-  .hub.procinfo:1!select name:fullname,logfile:.proc.getlog each fullname,depends_on:{[st;sub;pt] .proc.tofullnamex[;st]each key[sub]union pt}'[stackname;subscribe_to;publish_to]from a;
+  .hub.procinfo:1!select name:fullname,stackname,logfile:.proc.getlog each fullname,depends_on:{[st;sub;pt] .proc.tofullnamex[;st]each key[sub]union pt}'[stackname;subscribe_to;publish_to]from a;
   }
 
 / monitor processes
 monprocs:{
   .qi.import`mon;
-  .mon.follow each exec logfile from .hub.procinfo;
+  .mon.follow .'flip get exec stackname,logfile from .hub.procinfo;
   if[null .cron.jobs[f:`.mon.monitor]`period;.cron.add[f;0Np;.conf.MON_PERIOD]];
   }
 
