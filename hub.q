@@ -74,7 +74,7 @@ refresh:{
   }
 
 updprocs:{
-   pr:1!select name,proc,stackname,port,status:`down,pid:0Ni,lastheartbeat:0Np,attempts:0N,lastattempt:0Np,lastattempt:0Np,used:0N,heap:0N,goal:` from .ipc.conns where proc<>`hub;
+   pr:1!select name,proc,stackname,port,status:`down,pid:0Ni,heartbeat:0Np,attempts:0N,lastattempt:0Np,lastattempt:0Np,used:0N,heap:0N,goal:` from .ipc.conns where proc<>`hub;
   `procs set $[`procs in tables`.;pr upsert select from procs where status<>`down;pr];
   a:select from .proc.getstacks[] where fullname in exec name from procs;
   .hub.procinfo:1!select name:fullname,stackname,logfile:.proc.getlog each fullname,depends_on:{[st;sub;pt] .proc.tofullnamex[;st]each key[sub]union pt}'[stackname;subscribe_to;publish_to]from a;
@@ -121,7 +121,7 @@ check:{
   a:update health:{.proc.checkhealth .` vs x}each name from procs;
   a:update status:`down`up health[;0]from a;
   `procs set delete health from a,'exec health[;1]from a;
-  update status:`busy from`procs where status=`up,not null lastheartbeat,lastheartbeat<.z.p-.conf.HUB_BUSY_PERIOD;
+  update status:`busy from`procs where status=`up,not null heartbeat,heartbeat<.z.p-.conf.HUB_BUSY_PERIOD;
   if[count tostart:select from procs where goal=`up,status=`down,attempts<.conf.MAX_START_ATTEMPTS;
     if[count tostart:delete from tostart where not null lastattempt,.conf.HUB_ATTEMPT_PERIOD>.z.p-lastattempt;
       stilldown:exec name from procs where status=`down;
