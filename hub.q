@@ -23,6 +23,18 @@ readstack:{[st]
   $[.qi.exists p:.qi.path(.conf.STACKS;st;`stack.json);read0 p;'.qi.spath[p]," not found"]
   }
 
+writescript:{[filename;x]
+  .qi.info(`writescript;filename);
+  .qi.path[(.conf.SCRIPTS;filename)]0:x
+  }
+
+readscript:{[filename] 
+  .qi.info(`readscript;filename);
+  $[.qi.exists p:.qi.path(.conf.SCRIPTS;filename);read0 p;'.qi.spath[p]," not found"]
+  }
+
+readscripts:{(last each` vs'p)!read0 each p:.qi.paths[.conf.SCRIPTS;"*.q"]}
+
 deletestack:{[st]
   .qi.info(`deletestack;st);
   if[count a:select from procs where stackname=st,status<>`down;
