@@ -35,6 +35,8 @@ readscript:{[filename]
 
 readscripts:{(last each` vs'p)!read0 each p:.qi.paths[.conf.SCRIPTS;"*.q"]}
 
+deletescript:{[filename] $[.qi.exists p:.qi.path(.conf.SCRIPTS;filename);hdel p;'.qi.spath[p]," not found"]}
+
 deletestack:{[st]
   .qi.info(`deletestack;st);
   if[count a:select from procs where stackname=st,status<>`down;
